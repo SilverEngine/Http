@@ -1,0 +1,24 @@
+{
+    "name": "silverengine/http",
+    "description": "Http components for SilverEngine",
+    "type": "library",
+    "license": "MIT",
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {
+            "Silver\\": "src/main/Silver"
+        }
+    },
+    "require": {
+        "php": ">=7.1"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "7.4.*"
+    },
+    "authors": [
+        {
+            "name": "Nicolás Marulanda P.",
+            "email": "info@softn.red"
+        }
+    ]
+}
