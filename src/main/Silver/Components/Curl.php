@@ -29,6 +29,9 @@ class Curl {
     /** @var array */
     private $curlInfo;
     
+    /** @var int */
+    private $errno;
+    
     /**
      * Curl constructor.
      *
@@ -53,12 +56,13 @@ class Curl {
         curl_setopt_array($ch, ($this->options + $defaults));
         
         if ($result = curl_exec($ch)) {
-            $this->body       = substr($result, curl_getinfo($ch, CURLINFO_HEADER_SIZE));
+            $this->body       = $result;
             $this->statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             $this->curlInfo   = curl_getinfo($ch);
-        } else {
-            $this->error = curl_error($ch);
         }
+        
+        $this->error = curl_error($ch);
+        $this->errno = curl_errno($ch);
         
         curl_close($ch);
     }
@@ -102,6 +106,13 @@ class Curl {
      */
     public function getError(): string {
         return $this->error;
+    }
+    
+    /**
+     * @return int
+     */
+    public function getErrno(): int {
+        return $this->errno;
     }
     
     /**
