@@ -3,7 +3,7 @@
  * CurlTest.php
  */
 
-namespace Silver\Components;
+namespace Silver\Components\Http;
 
 use PHPUnit\Framework\TestCase;
 

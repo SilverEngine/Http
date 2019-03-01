@@ -3,7 +3,7 @@
  * ClientTest.php
  */
 
-namespace Silver\Components;
+namespace Silver\Components\Http;
 
 use PHPUnit\Framework\TestCase;
 
@@ -62,7 +62,7 @@ class ClientTest extends TestCase {
                 RequestOptions::TIMEOUT => 2,
         ]);
         $this->assertArrayHasKey(Client::BASE_URI, $client->getAllConfig());
-        $this->assertSame(self::DEFAULT_URI, $client->getConfig(Client::BASE_URI));
+        $this->assertSame([self::DEFAULT_URI], $client->getConfig(Client::BASE_URI));
         $this->assertArrayHasKey(RequestOptions::HEADERS, $client->getAllConfig());
         $this->assertArrayHasKey(RequestOptions::TIMEOUT, $client->getAllConfig());
     }

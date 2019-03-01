@@ -3,7 +3,7 @@
  * Client.php
  */
 
-namespace Silver\Components;
+namespace Silver\Components\Http;
 
 /**
  * @method Response get(string $uri, array $options = [])

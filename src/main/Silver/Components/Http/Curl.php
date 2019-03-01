@@ -3,7 +3,7 @@
  * Curl.php
  */
 
-namespace Silver\Components;
+namespace Silver\Components\Http;
 
 /**
  * Class Curl

@@ -3,7 +3,7 @@
  * RequestOptions.php
  */
 
-namespace Silver\Components;
+namespace Silver\Components\Http;
 
 /**
  * Class RequestOptions
