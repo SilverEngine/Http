@@ -38,22 +38,13 @@ class Curl {
      * @param array $options
      */
     public function __construct(array $options = []) {
-        $this->options = $options;
+        $this->optionsDefault($options);
         $this->headers = [];
     }
     
     public function create() {
-        $defaults = [
-                CURLOPT_HEADER         => FALSE,
-                CURLOPT_FRESH_CONNECT  => TRUE,
-                CURLOPT_RETURNTRANSFER => TRUE,
-                CURLOPT_TIMEOUT        => 4,
-                CURLOPT_PROTOCOLS      => CURLPROTO_HTTP | CURLPROTO_HTTPS,
-                CURLOPT_HEADERFUNCTION => $this->headerFunction(),
-        ];
-        
         $ch = curl_init();
-        curl_setopt_array($ch, ($this->options + $defaults));
+        curl_setopt_array($ch, $this->options);
         
         if ($result = curl_exec($ch)) {
             $this->body       = $result;
@@ -75,16 +66,7 @@ class Curl {
     }
     
     public function updateOptions(array $options): void {
-        $auxOptions = $options;
-        
-        foreach ($auxOptions as $key => $value) {
-            if (isset($this->options[$key])) {
-                unset($options[$key]);
-                $this->options[$key] = $value;
-            }
-        }
-        
-        $this->options += $options;
+        $this->options = $options + $this->options;
     }
     
     /**
@@ -130,7 +112,7 @@ class Curl {
     }
     
     private function headerFunction(): \Closure {
-        return function($ch, string $header) {
+        return function($ch, string $header): int {
             $auxHeader = trim($header);
             
             if ($auxHeader !== '') {
@@ -139,5 +121,17 @@ class Curl {
             
             return strlen($header);
         };
+    }
+    
+    private function optionsDefault(array $options = []) {
+        $this->options = [
+                CURLOPT_HEADER         => FALSE,
+                CURLOPT_FRESH_CONNECT  => TRUE,
+                CURLOPT_RETURNTRANSFER => TRUE,
+                CURLOPT_TIMEOUT        => 4,
+                CURLOPT_PROTOCOLS      => CURLPROTO_HTTP | CURLPROTO_HTTPS,
+                CURLOPT_HEADERFUNCTION => $this->headerFunction(),
+        ];
+        $this->updateOptions($options);
     }
 }
