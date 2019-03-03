@@ -50,26 +50,7 @@ class Client {
                 CURLOPT_CUSTOMREQUEST => $method,
         ];
         
-        if (isset($options[RequestOptions::JSON])) {
-            $curlOptions[CURLOPT_POSTFIELDS]                  = json_encode($options[RequestOptions::JSON]);
-            $options[RequestOptions::HEADERS]['Content-Type'] = 'application/json';
-            $options[RequestOptions::HEADERS]['Accept']       = 'application/json';
-        }
-        
-        if (isset($options[RequestOptions::HEADERS])) {
-            $headers = $options[RequestOptions::HEADERS];
-            
-            foreach ($headers as $key => $value) {
-                $value = (string)$value;
-                
-                if ($value === '') {
-                    $curlOptions[CURLOPT_HTTPHEADER][] = "$key;";
-                } else {
-                    $curlOptions[CURLOPT_HTTPHEADER][] = "$key: $value";
-                }
-            }
-        }
-        
+        $this->applyOptions($method, $options, $curlOptions);
         $this->curl->updateOptions($curlOptions);
         $this->curl->create();
         
@@ -94,17 +75,17 @@ class Client {
      */
     public function getConfig(string $option): ?array {
         if (!isset($this->config[$option])) {
-            return NULL;
             
+            return NULL;
         }
         
         $config = $this->config[$option];
         
-        if (is_array($config)) {
-            return $config;
+        if (!is_array($config)) {
+            $config = [$config];
         }
         
-        return [$config];
+        return $config;
     }
     
     public function getAllConfig(): array {
@@ -121,7 +102,7 @@ class Client {
                         'Expect'          => '',
                 ],
         ];
-        $this->config = array_merge_recursive($config, $default);
+        $this->config = Utils::arrayMergeRecursiveDistinct($config, $default);
         
         if (isset($config[RequestOptions::CURL])) {
             $this->curl->updateOptions($config[RequestOptions::CURL]);
@@ -138,7 +119,7 @@ class Client {
     }
     
     private function buildUri(string $uri, string $method, array $options): string {
-        $baseUrl = isset($options[self::BASE_URI]) ? $this->trimUri($options[self::BASE_URI]) . '/' : '';
+        $baseUrl = isset($options[self::BASE_URI]) ? Utils::trimUri($options[self::BASE_URI]) . '/' : '';
         
         if (strcasecmp($method, 'get') == 0 && isset($options[RequestOptions::QUERY])) {
             $query = $options[RequestOptions::QUERY];
@@ -157,7 +138,7 @@ class Client {
             }
         }
         
-        return $baseUrl . $this->trimUri($uri);
+        return $baseUrl . Utils::trimUri($uri);
     }
     
     private function defaultOptions(array $options): array {
@@ -169,7 +150,7 @@ class Client {
             throw new \InvalidArgumentException('Query must be a string or array.');
         }
         
-        return array_merge_recursive($options, $this->config);
+        return Utils::arrayMergeRecursiveDistinct($options, $this->config);
     }
     
     private function headersIsValid(array $options): bool {
@@ -191,8 +172,40 @@ class Client {
         return $result;
     }
     
-    private function trimUri(string $uri): string {
-        return trim($uri, '/');
+    private function applyOptions(string $method, array &$options, array &$curlOptions) {
+        $curlOptPostFields = '';
+        $contentType       = '';
+        
+        if (isset($options[RequestOptions::JSON])) {
+            $curlOptPostFields = json_encode($options[RequestOptions::JSON]);
+            $contentType       = 'application/json';
+        } elseif (isset($options[RequestOptions::FORM_PARAMS])) {
+            $curlOptPostFields = http_build_query($options[RequestOptions::FORM_PARAMS]);
+            $contentType       = 'application/x-www-form-urlencoded';
+        }
+        
+        if (strcasecmp($method, 'get') != 0) {
+            $curlOptions[CURLOPT_POSTFIELDS]                  = $curlOptPostFields;
+            $options[RequestOptions::HEADERS]['Content-Type'] = $contentType;
+        }
+        
+        if (isset($options[RequestOptions::HEADERS]['Accept'])) {
+            $options[RequestOptions::HEADERS]['Accept'] = 'application/json';
+        }
+        
+        if (isset($options[RequestOptions::HEADERS])) {
+            $headers = $options[RequestOptions::HEADERS];
+            
+            foreach ($headers as $key => $value) {
+                $value = (string)$value;
+                
+                if ($value === '') {
+                    $curlOptions[CURLOPT_HTTPHEADER][] = "$key;";
+                } else {
+                    $curlOptions[CURLOPT_HTTPHEADER][] = "$key: $value";
+                }
+            }
+        }
     }
     
 }

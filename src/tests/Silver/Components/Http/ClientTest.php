@@ -111,4 +111,44 @@ class ClientTest extends TestCase {
         self::assertEquals(200, $response->getStatusCode());
     }
     
+    public function testGetConfig() {
+        $config = [
+                Client::BASE_URI        => self::DEFAULT_URI,
+                RequestOptions::HEADERS => [
+                        'Accept' => 'application/json',
+                ],
+        ];
+        
+        $client = new Client($config);
+        self::assertCount(2, $client->getAllConfig());
+        
+        $config[RequestOptions::TIMEOUT] = 2;
+        $client                          = new Client($config);
+        self::assertCount(3, $client->getAllConfig());
+        self::assertTrue(is_array($client->getConfig(RequestOptions::TIMEOUT)));
+        self::assertSame(2, $client->getConfig(RequestOptions::TIMEOUT)[0]);
+    }
+    
+    public function testDuplicateHeaders() {
+        $value   = 'application/json';
+        $key     = 'Accept';
+        $headers = [
+                RequestOptions::HEADERS => [
+                        $key => $value,
+                ],
+        ];
+        $config  = [
+                Client::BASE_URI        => self::DEFAULT_URI,
+                RequestOptions::HEADERS => [
+                        $key => $value,
+                ],
+        ];
+        
+        $client   = new Client($config);
+        $response = $client->get('posts', $headers);
+        self::assertEquals(200, $response->getStatusCode());
+        self::assertArrayHasKey($key, $client->getConfig(RequestOptions::HEADERS));
+        self::assertSame($value, $client->getConfig(RequestOptions::HEADERS)[$key]);
+    }
+    
 }
