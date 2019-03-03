@@ -21,4 +21,6 @@ class RequestOptions {
     
     const TIMEOUT = 'timeout';
     
+    const FORM_PARAMS = 'form_params';
+    
 }

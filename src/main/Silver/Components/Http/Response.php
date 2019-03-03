@@ -95,12 +95,16 @@ class Response {
         $this->statusCode = $statusCode;
     }
     
-    public function getHeader($header): array {
+    public function getHeader(string $header): array {
         if (isset($this->headers[$header])) {
             return $this->headers[$header];
         }
         
         return [];
+    }
+    
+    public function getHeaderLine(string $header): string {
+        return implode(', ', $this->getHeader($header));
     }
     
     /**
