@@ -6,7 +6,7 @@
     "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
-            "Silver\\": "src/main/Silver"
+            "Silver\\": "src/Silver"
         }
     },
     "require": {
@@ -16,7 +16,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Silver\\": "src/tests/Silver"
+            "Silver\\": "tests/Silver"
         }
     },
     "require-dev": {
